@@ -1,5 +1,7 @@
 # Treelogger
 
+[![StyleCI](https://styleci.io/repos/57818067/shield)](https://styleci.io/repos/59567682)
+
 ## Installation
 
 Require this package with composer:

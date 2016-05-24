@@ -15,6 +15,12 @@ TeamArctic\TreeLogger\TreeloggerServiceProvider::class,
 ```
 
 
+## Usage
+
+```
+php artisan log:controller
+```
+
 ## Credits
 
 ### Contributors

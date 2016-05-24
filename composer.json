@@ -1,0 +1,20 @@
+{
+    "name": "yinx/treelogger",
+    "description": "A small command which places a logline in every controller, to start the process of using logs in big projects.",
+    "keywords": ["laravel","logging"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Philippe Damen",
+            "email": "mr.deleeuw@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^5.3.3 || ^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Yinx\\TreeLogger\\": "src/"
+        }
+    }
+}

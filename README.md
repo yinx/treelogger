@@ -11,7 +11,7 @@ composer require yinx/treelogger
 Next add the ServiceProvider to the providers array in config/app.php
 
 ```sh
-TeamArctic\TreeLogger\TreeloggerServiceProvider::class,
+Yinx\TreeLogger\TreeLoggerServiceProvider::class,
 ```
 
 

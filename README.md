@@ -7,7 +7,7 @@
 Require this package with composer:
 
 ```sh
-composer require yinx/treelogger:~laravel-4
+composer require yinx/treelogger:v0.5.1
 ```
 
 Next add the ServiceProvider to the providers array in config/app.php

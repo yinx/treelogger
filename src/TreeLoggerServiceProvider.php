@@ -23,10 +23,12 @@ class TreeLoggerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('command.yinx.treelogger', function ($app) {
-            return $app['Yinx\TreeLogger\Commands\TreeLoggerCommand'];
-        });
-        $this->commands('command.yinx.treelogger');
+        $this->app['command.yinx.treelogger'] = $this->app->share(
+            function ($app) {
+                return new Commands\TreeLoggerCommand();
+            }
+        );
+        $this->commands(array('command.yinx.treelogger'));
     }
 
     /**
@@ -36,5 +38,6 @@ class TreeLoggerServiceProvider extends ServiceProvider
      */
     public function provides()
     {
+        return array('command.yinx.treelogger');
     }
 }

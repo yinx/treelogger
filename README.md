@@ -7,13 +7,13 @@
 Require this package with composer:
 
 ```sh
-composer require yinx/treelogger
+composer require yinx/treelogger:~laravel-4
 ```
 
 Next add the ServiceProvider to the providers array in config/app.php
 
 ```sh
-Yinx\TreeLogger\TreeLoggerServiceProvider::class,
+Yinx\TreeLogger\TreeLoggerServiceProvider,
 ```
 
 
@@ -23,9 +23,9 @@ Yinx\TreeLogger\TreeLoggerServiceProvider::class,
 php artisan log:controller
 ```
 
-Append --v to get a verbose output.
+Append --verbose to get a verbose output.
 
-Append --rm to remove all the loglines.
+Append --remove to remove all the loglines.
 
 ## Credits
 

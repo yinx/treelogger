@@ -3,6 +3,7 @@
 namespace Yinx\TreeLogger\Commands;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputOption;
 
 class TreeLoggerCommand extends Command
 {
@@ -11,7 +12,7 @@ class TreeLoggerCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'log:controller {--rm : Removes loglines instead.} {--v : Set the output level to verbose.} {blacklist?* : Define functions to blacklist.} {--construct : Override default behaviour and place loglines in construct functions.}';
+    protected $name = 'log:controller';
 
     /**
      * The console command description.
@@ -27,18 +28,16 @@ class TreeLoggerCommand extends Command
      */
     protected $controllerBaseUrl = '';
 
-    /**TODO implement blacklist and __construct whitelist.
-
     /**
      * Execute the console command.
      *
      * @return mixed
      */
-    public function handle()
+    public function fire()
     {
-        $this->controllerBaseUrl = $this->laravel['path'].DIRECTORY_SEPARATOR.'Http'.DIRECTORY_SEPARATOR.'Controllers';
+        $this->controllerBaseUrl = $this->laravel['path'].DIRECTORY_SEPARATOR.'Controllers';
 
-        if ($this->option('rm')) {
+        if ($this->option('remove')) {
             if ($this->confirm('This command will REMOVE ALL your loglines from your controllers.'."\n".'Are you sure you want to continue? [y|N]')) {
                 $this->start();
             }
@@ -47,6 +46,13 @@ class TreeLoggerCommand extends Command
                 $this->start();
             }
         }
+    }
+
+    public function getOptions()
+    {
+        return array(
+            array('remove','rm', InputOption::VALUE_NONE, 'Removes loglines instead.'),
+        );
     }
 
     /**
@@ -72,7 +78,7 @@ class TreeLoggerCommand extends Command
                 if ($this->isDir($file, $parentDir)) {
                     $this->loopFiles($value, $parentDir.DIRECTORY_SEPARATOR.$file);
                 } else {
-                    if ($this->option('rm')) {
+                    if ($this->option('remove')) {
                         $this->removeAllLogsInControllers($parentDir.DIRECTORY_SEPARATOR.$value);
                     } else {
                         $this->writeToFile($parentDir.DIRECTORY_SEPARATOR.$value);
@@ -82,7 +88,7 @@ class TreeLoggerCommand extends Command
                 if ($this->isDir($file)) {
                     $this->loopFiles($value, $file);
                 } else {
-                    if ($this->option('rm')) {
+                    if ($this->option('remove')) {
                         $this->removeAllLogsInControllers($value);
                     } else {
                         $this->writeToFile($value);
@@ -150,7 +156,7 @@ class TreeLoggerCommand extends Command
                     function ($match) {return empty($match[3]) ? $match[0]."\n\t\tLog::info('".$match[2].")');" : $match[0]."\n\t\tLog::info('".$match[2]."'. ".str_replace(',', ".','.", $match[3]).".')' );"; }, $fileContents);
 
                 file_put_contents($filePath, $fileContents);
-                if ($this->option('v')) {
+                if ($this->option('verbose')) {
                     $this->info('Wrote logline to '.$file);
                 }
             }
@@ -160,7 +166,7 @@ class TreeLoggerCommand extends Command
             $fileContents = preg_replace_callback('/(public |protected |private )?function (.*)([$].*)?\\)[\\r]?[\\n]?[\\t]*[ ]*{/U',
                 function ($match) {return empty($match[3]) ? $match[0]."\n\t\tLog::info('".$match[2].")');" : $match[0]."\n\t\tLog::info('".$match[2]."'. ".str_replace(',', ".','.", $match[3]).".')' );"; }, $fileContents);
             file_put_contents($filePath, $fileContents);
-            if ($this->option('v')) {
+            if ($this->option('verbose')) {
                 $this->info('Writing logline to '.$file);
             }
         }
@@ -184,7 +190,7 @@ class TreeLoggerCommand extends Command
      */
     public function removeAllLogsInControllers($file)
     {
-        if ($this->option('v')) {
+        if ($this->option('verbose')) {
             $this->info('Removing logline in '.$file);
         }
         $filePath = $this->controllerBaseUrl.DIRECTORY_SEPARATOR.$file;

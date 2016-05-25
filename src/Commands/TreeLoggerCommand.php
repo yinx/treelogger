@@ -50,9 +50,9 @@ class TreeLoggerCommand extends Command
 
     public function getOptions()
     {
-        return array(
-            array('remove','rm', InputOption::VALUE_NONE, 'Removes loglines instead.'),
-        );
+        return [
+            ['remove', 'rm', InputOption::VALUE_NONE, 'Removes loglines instead.'],
+        ];
     }
 
     /**

@@ -28,7 +28,7 @@ class TreeLoggerServiceProvider extends ServiceProvider
                 return new Commands\TreeLoggerCommand();
             }
         );
-        $this->commands(array('command.yinx.treelogger'));
+        $this->commands(['command.yinx.treelogger']);
     }
 
     /**
@@ -38,6 +38,6 @@ class TreeLoggerServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('command.yinx.treelogger');
+        return ['command.yinx.treelogger'];
     }
 }

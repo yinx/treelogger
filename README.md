@@ -2,6 +2,8 @@
 
 [![StyleCI](https://styleci.io/repos/57818067/shield)](https://styleci.io/repos/59567682)
 
+# For laravel 4 switch to the laravel-4 branch.
+
 ## Installation
 
 Require this package with composer:

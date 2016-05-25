@@ -13,7 +13,7 @@ composer require yinx/treelogger:~laravel-4
 Next add the ServiceProvider to the providers array in config/app.php
 
 ```sh
-Yinx\TreeLogger\TreeLoggerServiceProvider,
+"Yinx\TreeLogger\TreeLoggerServiceProvider",
 ```
 
 

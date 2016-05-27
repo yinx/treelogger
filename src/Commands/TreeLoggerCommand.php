@@ -11,7 +11,7 @@ class TreeLoggerCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'log:controller {--rm : Removes loglines instead.} {--v : Set the output level to verbose.} {blacklist?* : Define functions to blacklist.} {--construct : Override default behaviour and place loglines in construct functions.}';
+    protected $signature = 'log:controller {--rm : Removes log-lines instead.} {--v : Set the output level to verbose.} {blacklist?* : Define controllers to blacklist.}';
 
     /**
      * The console command description.
@@ -27,7 +27,18 @@ class TreeLoggerCommand extends Command
      */
     protected $controllerBaseUrl = '';
 
-    /**TODO implement blacklist and __construct whitelist.
+    /**
+     * The regex string which is used to find the function tags in each controller.
+     *
+     * @var string
+     */
+    protected $regexPattern = '/(public |protected |private )?'. // matches an optional method visibility
+    'function (.*)'. // 'function' followed by the method name and possible type-hint.
+    '([$].*)?\\)'. // optional parameters
+    '[\\r]?[\\n]?[\\t]*[ ]*{'. // possible newlines/tabs/carriage returns and spaces followed by a '{'
+    '/U'; // Inverts the greediness so they are not greedy by default.
+
+    protected $controllerCount = 0;
 
     /**
      * Execute the console command.
@@ -38,13 +49,19 @@ class TreeLoggerCommand extends Command
     {
         $this->controllerBaseUrl = $this->laravel['path'].DIRECTORY_SEPARATOR.'Http'.DIRECTORY_SEPARATOR.'Controllers';
 
+        if($this->argument('blacklist')){
+            $this->error("The blacklist argument hasn't been implemented yet. The command will put logs in every controller.");
+        }
+
         if ($this->option('rm')) {
-            if ($this->confirm('This command will REMOVE ALL your loglines from your controllers.'."\n".'Are you sure you want to continue? [y|N]')) {
+            if ($this->confirm('This command will REMOVE ALL your log-lines from your controllers.'."\n".'Are you sure you want to continue? [y|N]')) {
                 $this->start();
+                $this->info("Removed log-lines in ". $this->controllerCount." controllers.");
             }
-        } else {
+        }else {
             if ($this->confirm('This command will CHANGE your controllers.'."\n".'Are you sure you want to continue? [y|N]')) {
                 $this->start();
+                $this->info("Wrote log-lines to ". $this->controllerCount." controllers.");
             }
         }
     }
@@ -75,7 +92,7 @@ class TreeLoggerCommand extends Command
                     if ($this->option('rm')) {
                         $this->removeAllLogsInControllers($parentDir.DIRECTORY_SEPARATOR.$value);
                     } else {
-                        $this->writeToFile($parentDir.DIRECTORY_SEPARATOR.$value);
+                        $this->getFileToWrite($parentDir.DIRECTORY_SEPARATOR.$value);
                     }
                 }
             } else {
@@ -85,7 +102,7 @@ class TreeLoggerCommand extends Command
                     if ($this->option('rm')) {
                         $this->removeAllLogsInControllers($value);
                     } else {
-                        $this->writeToFile($value);
+                        $this->getFileToWrite($value);
                     }
                 }
             }
@@ -133,48 +150,65 @@ class TreeLoggerCommand extends Command
     }
 
     /**
-     * Writes the log lines to the $file.
+     * Callback method for the regex replace.
+     * Checks if the function definition has multiple parameters and replaces accordingly
+     *
+     * @param $match
+     * @return string
+     */
+    private function regexCallback($match){
+        return empty($match[3]) ?
+            $match[0]."\n\t\tLog::info('".$match[2].")');" :
+            $match[0]."\n\t\tLog::info('".$match[2]."'. ".str_replace(',', ".','.", $match[3]).".')' );";
+    }
+
+    /**
+     * Gets the file, checks for existing log-lines
      *
      * @param $file
      */
-    public function writeToFile($file)
+    public function getFileToWrite($file)
     {
         $filePath = $this->controllerBaseUrl.DIRECTORY_SEPARATOR.$file;
-
         $fileContents = file_get_contents($filePath);
 
         if ($this->checkForLogLines($fileContents)) {
-            if ($this->confirm('We might have found some log lines in the file '.$file.'.'."\n".' Do you want to continue? [y|N]')) {
-                //TODO document regex
-                $fileContents = preg_replace_callback('/(public |protected |private )?function (.*)([$].*)?\\)[\\r]?[\\n]?[\\t]*[ ]*{/U',
-                    function ($match) {return empty($match[3]) ? $match[0]."\n\t\tLog::info('".$match[2].")');" : $match[0]."\n\t\tLog::info('".$match[2]."'. ".str_replace(',', ".','.", $match[3]).".')' );"; }, $fileContents);
-
-                file_put_contents($filePath, $fileContents);
-                if ($this->option('v')) {
-                    $this->info('Wrote logline to '.$file);
-                }
+            if ($this->confirm('We might have found some log-lines in the file '.$file.'.'."\n".' Do you want to continue? [y|N]')) {
+                $this->writeToFile($file, $filePath, $fileContents);
             }
         } else {
-            //TODO document regex
             $fileContents = preg_replace('/use .*;/', 'use Log;'."\n".'$0', $fileContents, 1);
-            $fileContents = preg_replace_callback('/(public |protected |private )?function (.*)([$].*)?\\)[\\r]?[\\n]?[\\t]*[ ]*{/U',
-                function ($match) {return empty($match[3]) ? $match[0]."\n\t\tLog::info('".$match[2].")');" : $match[0]."\n\t\tLog::info('".$match[2]."'. ".str_replace(',', ".','.", $match[3]).".')' );"; }, $fileContents);
-            file_put_contents($filePath, $fileContents);
-            if ($this->option('v')) {
-                $this->info('Writing logline to '.$file);
-            }
+            $this->writeToFile($file, $filePath, $fileContents);
+        }
+        $this->controllerCount++;
+    }
+
+    /**
+     * Write content to file based on the regex.
+     *
+     * @param $file
+     * @param $filePath
+     * @param $fileContents
+     */
+    private function writeToFile($file,$filePath,$fileContents){
+        $fileContents = preg_replace_callback($this->regexPattern,
+            [$this,'regexCallback'],
+            $fileContents);
+        file_put_contents($filePath, $fileContents);
+        if ($this->option('v')) {
+            $this->info('Wrote log-line to '.$file);
         }
     }
 
     /**
-     * Checks the file for existing loglines.
+     * Checks the file for existing log-lines.
      *
      * @param $fileContents
      * @return bool
      */
     public function checkForLogLines($fileContents)
     {
-        return preg_match('/(use Log;|Log::emergency\\(|Log::alert\\(|Log::critical\\(|Log::error\\(|Log::warning\\(|Log::notice\\(|Log::info\\(|Log::debug\\()/', $fileContents, $output_array);
+        return preg_match('/(use Log;|Log::)/', $fileContents, $output_array);
     }
 
     /**
@@ -185,11 +219,12 @@ class TreeLoggerCommand extends Command
     public function removeAllLogsInControllers($file)
     {
         if ($this->option('v')) {
-            $this->info('Removing logline in '.$file);
+            $this->info('Removing log-line in '.$file);
         }
         $filePath = $this->controllerBaseUrl.DIRECTORY_SEPARATOR.$file;
 
         $fileContents = file_get_contents($filePath);
+        $this->controllerCount++;
 
         $fileContents = preg_replace("/([\n| |\t]use Log;|[\n| |\t]*Log::.*\\(.*\\);)/", '', $fileContents);
 

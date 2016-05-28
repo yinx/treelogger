@@ -32,10 +32,10 @@ class TreeLoggerCommand extends Command
      *
      * @var string
      */
-    protected $regexPattern = '/(public |protected |private )?'. // matches an optional method visibility
-    'function (.*)'. // 'function' followed by the method name and possible type-hint.
-    '([$].*)?\\)'. // optional parameters
-    '[\\r]?[\\n]?[\\t]*[ ]*{'. // possible newlines/tabs/carriage returns and spaces followed by a '{'
+    protected $regexPattern = '/(public |protected |private )?'.// matches an optional method visibility
+    'function (.*)'.// 'function' followed by the method name and possible type-hint.
+    '([$].*)?\\)'.// optional parameters
+    '[\\r]?[\\n]?[\\t]*[ ]*{'.// possible newlines/tabs/carriage returns and spaces followed by a '{'
     '/U'; // Inverts the greediness so they are not greedy by default.
 
     protected $controllerCount = 0;
@@ -49,19 +49,19 @@ class TreeLoggerCommand extends Command
     {
         $this->controllerBaseUrl = $this->laravel['path'].DIRECTORY_SEPARATOR.'Http'.DIRECTORY_SEPARATOR.'Controllers';
 
-        if($this->argument('blacklist')){
+        if ($this->argument('blacklist')) {
             $this->error("The blacklist argument hasn't been implemented yet. The command will put logs in every controller.");
         }
 
         if ($this->option('rm')) {
             if ($this->confirm('This command will REMOVE ALL your log-lines from your controllers.'."\n".'Are you sure you want to continue? [y|N]')) {
                 $this->start();
-                $this->info("Removed log-lines in ". $this->controllerCount." controllers.");
+                $this->info('Removed log-lines in '.$this->controllerCount.' controllers.');
             }
-        }else {
+        } else {
             if ($this->confirm('This command will CHANGE your controllers.'."\n".'Are you sure you want to continue? [y|N]')) {
                 $this->start();
-                $this->info("Wrote log-lines to ". $this->controllerCount." controllers.");
+                $this->info('Wrote log-lines to '.$this->controllerCount.' controllers.');
             }
         }
     }
@@ -151,19 +151,20 @@ class TreeLoggerCommand extends Command
 
     /**
      * Callback method for the regex replace.
-     * Checks if the function definition has multiple parameters and replaces accordingly
+     * Checks if the function definition has multiple parameters and replaces accordingly.
      *
      * @param $match
      * @return string
      */
-    private function regexCallback($match){
+    private function regexCallback($match)
+    {
         return empty($match[3]) ?
             $match[0]."\n\t\tLog::info('".$match[2].")');" :
             $match[0]."\n\t\tLog::info('".$match[2]."'. ".str_replace(',', ".','.", $match[3]).".')' );";
     }
 
     /**
-     * Gets the file, checks for existing log-lines
+     * Gets the file, checks for existing log-lines.
      *
      * @param $file
      */
@@ -190,9 +191,10 @@ class TreeLoggerCommand extends Command
      * @param $filePath
      * @param $fileContents
      */
-    private function writeToFile($file,$filePath,$fileContents){
+    private function writeToFile($file, $filePath, $fileContents)
+    {
         $fileContents = preg_replace_callback($this->regexPattern,
-            [$this,'regexCallback'],
+            [$this, 'regexCallback'],
             $fileContents);
         file_put_contents($filePath, $fileContents);
         if ($this->option('v')) {

@@ -69,7 +69,7 @@ class TreeLoggerCommand extends Command
     /**
      * Starts the command loop.
      */
-    public function start()
+    private function start()
     {
         $filesArray = $this->dirToArray($this->controllerBaseUrl);
         $this->loopFiles($filesArray);
@@ -82,7 +82,7 @@ class TreeLoggerCommand extends Command
      * @param $array
      * @param null $parentDir parameter for recursive calls
      */
-    public function loopFiles($array, $parentDir = null)
+    private function loopFiles($array, $parentDir = null)
     {
         foreach ($array as $file => $value) {
             if ($parentDir != null) {
@@ -116,7 +116,7 @@ class TreeLoggerCommand extends Command
      * @param null $parentDir
      * @return bool
      */
-    public function isDir($file, $parentDir = null)
+    private function isDir($file, $parentDir = null)
     {
         if ($parentDir == null) {
             return is_dir($this->controllerBaseUrl.DIRECTORY_SEPARATOR.$file);
@@ -131,7 +131,7 @@ class TreeLoggerCommand extends Command
      * @param $dir
      * @return array
      */
-    public function dirToArray($dir)
+    private function dirToArray($dir)
     {
         $result = [];
 
@@ -167,7 +167,7 @@ class TreeLoggerCommand extends Command
      *
      * @param $file
      */
-    public function getFileToWrite($file)
+    private function getFileToWrite($file)
     {
         $filePath = $this->controllerBaseUrl.DIRECTORY_SEPARATOR.$file;
         $fileContents = file_get_contents($filePath);
@@ -206,7 +206,7 @@ class TreeLoggerCommand extends Command
      * @param $fileContents
      * @return bool
      */
-    public function checkForLogLines($fileContents)
+    private function checkForLogLines($fileContents)
     {
         return preg_match('/(use Log;|Log::)/', $fileContents, $output_array);
     }
@@ -216,7 +216,7 @@ class TreeLoggerCommand extends Command
      *
      * @param $file
      */
-    public function removeAllLogsInControllers($file)
+    private function removeAllLogsInControllers($file)
     {
         if ($this->option('v')) {
             $this->info('Removing log-line in '.$file);

@@ -29,7 +29,7 @@ class TreeLoggerServiceProvider extends ServiceProvider
         $this->app->singleton('command.yinx.remove', function ($app) {
             return $app['Yinx\TreeLogger\Commands\RemoveLogsCommand'];
         });
-        $this->commands(['command.yinx.treelogger','command.yinx.remove']);
+        $this->commands(['command.yinx.treelogger', 'command.yinx.remove']);
     }
 
     /**

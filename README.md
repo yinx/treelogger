@@ -21,13 +21,22 @@ Yinx\TreeLogger\TreeLoggerServiceProvider::class,
 
 ## Usage
 
+### Adding the log-lines
+
 ```
-php artisan log:controller
+php artisan controller:logs:add
 ```
 
 Append --v to get a verbose output.
 
-Append --rm to remove all the loglines.
+
+### Removing the log-lines
+
+```
+php artisan controller:logs:remove
+```
+
+Append --v to get a verbose output.
 
 ## Credits
 

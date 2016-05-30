@@ -16,7 +16,7 @@ class RemoveLogsCommand extends FileBaseCommand
      *
      * @var string
      */
-    protected $signature = 'controller:log:remove {--v : Set the output level to verbose.}';
+    protected $signature = 'controller:logs:remove {--v : Set the output level to verbose.}';
 
     /**
      * The console command description.

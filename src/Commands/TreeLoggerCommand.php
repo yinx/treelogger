@@ -10,7 +10,7 @@ class TreeLoggerCommand extends FileBaseCommand
      *
      * @var string
      */
-    protected $signature = 'controller:log:add {--v : Set the output level to verbose.} {blacklist?* : Define controllers to blacklist.}';
+    protected $signature = 'controller:logs:add {--v : Set the output level to verbose.} {blacklist?* : Define controllers to blacklist.}';
 
     /**
      * The console command description.

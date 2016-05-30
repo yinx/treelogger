@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: yinx
  * Date: 29/05/2016
- * Time: 12:01
+ * Time: 12:01.
  */
-
 namespace Yinx\TreeLogger\Commands;
 
 use Illuminate\Console\Command;
@@ -20,15 +19,15 @@ abstract class FileBaseCommand extends Command
     protected $controllerBaseUrl = '';
 
     /**
-     * amount of controllers affected
-     * 
+     * amount of controllers affected.
+     *
      * @var int
      */
     protected $controllerCount = 0;
 
     /**
-     * Starts the command loop
-     * 
+     * Starts the command loop.
+     *
      * @return mixed
      */
     abstract protected function start();
@@ -38,7 +37,8 @@ abstract class FileBaseCommand extends Command
      *
      * @return void
      */
-    public function handle(){
+    public function handle()
+    {
         $this->controllerBaseUrl = $this->laravel['path'].DIRECTORY_SEPARATOR.'Http'.DIRECTORY_SEPARATOR.'Controllers';
         $this->start();
     }
@@ -83,7 +83,8 @@ abstract class FileBaseCommand extends Command
         return $result;
     }
 
-    protected function writeToFile($path,$contents){
+    protected function writeToFile($path, $contents)
+    {
         if (! file_put_contents($path, $contents)) {
             $this->error('Something went wrong writing to '.$path);
         }

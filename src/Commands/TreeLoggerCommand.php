@@ -2,7 +2,6 @@
 
 namespace Yinx\TreeLogger\Commands;
 
-
 class TreeLoggerCommand extends FileBaseCommand
 {
     /**
@@ -24,10 +23,10 @@ class TreeLoggerCommand extends FileBaseCommand
      *
      * @var string
      */
-    protected $regexPattern = '/(public |protected |private )?'. // matches an optional method visibility
-    'function (.*)'. // 'function' followed by the method name and possible type-hint.
-    '([$].*)?\\)'. // optional parameters
-    '[\\r]?[\\n]?[\\t]*[ ]*{'. // possible newlines/tabs/carriage returns and spaces followed by a '{'
+    protected $regexPattern = '/(public |protected |private )?'.// matches an optional method visibility
+    'function (.*)'.// 'function' followed by the method name and possible type-hint.
+    '([$].*)?\\)'.// optional parameters
+    '[\\r]?[\\n]?[\\t]*[ ]*{'.// possible newlines/tabs/carriage returns and spaces followed by a '{'
     '/U'; // Inverts the greediness so they are not greedy by default.
 
     /**
@@ -35,16 +34,15 @@ class TreeLoggerCommand extends FileBaseCommand
      */
     public function start()
     {
-        if($this->argument('blacklist')){
+        if ($this->argument('blacklist')) {
             $this->error("The blacklist argument hasn't been implemented yet. The command will put logs in every controller.");
         }
 
         if ($this->confirm('This command will CHANGE your controllers.'."\n".'Are you sure you want to continue? [y|N]')) {
             $filesArray = $this->dirToArray($this->controllerBaseUrl);
             $this->loopFiles($filesArray);
-            $this->info("Wrote log-lines to ". $this->controllerCount." controllers.");
+            $this->info('Wrote log-lines to '.$this->controllerCount.' controllers.');
         }
-
     }
 
     /**
@@ -74,7 +72,7 @@ class TreeLoggerCommand extends FileBaseCommand
     }
 
     /**
-     * Gets the file, checks for existing log-lines
+     * Gets the file, checks for existing log-lines.
      *
      * @param $file
      */
@@ -101,9 +99,10 @@ class TreeLoggerCommand extends FileBaseCommand
      * @param $filePath
      * @param $fileContents
      */
-    protected function regexCheck($file,$filePath,$fileContents){
+    protected function regexCheck($file, $filePath, $fileContents)
+    {
         $fileContents = preg_replace_callback($this->regexPattern,
-            [$this,'regexCallback'],
+            [$this, 'regexCallback'],
             $fileContents);
         $this->writeToFile($filePath, $fileContents);
         if ($this->option('v')) {
@@ -113,15 +112,15 @@ class TreeLoggerCommand extends FileBaseCommand
 
     /**
      * Callback method for the regex replace.
-     * Checks if the function definition has multiple parameters and replaces accordingly
+     * Checks if the function definition has multiple parameters and replaces accordingly.
      *
      * @param $match
      * @return string
      */
-    protected function regexCallback($match){
+    protected function regexCallback($match)
+    {
         return empty($match[3]) ?
             $match[0]."\n\t\tLog::info('".$match[2].")');" :
             $match[0]."\n\t\tLog::info('".$match[2]."'. ".str_replace(',', ".','.", $match[3]).".')' );";
     }
-
 }

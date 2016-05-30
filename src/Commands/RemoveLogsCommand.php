@@ -3,11 +3,9 @@
  * Created by PhpStorm.
  * User: yinx
  * Date: 30/05/2016
- * Time: 16:49
+ * Time: 16:49.
  */
-
 namespace Yinx\TreeLogger\Commands;
-
 
 class RemoveLogsCommand extends FileBaseCommand
 {
@@ -25,7 +23,6 @@ class RemoveLogsCommand extends FileBaseCommand
      */
     protected $description = 'Removes all log-lines in every function of every controller.';
 
-
     /**
      * Starts the command loop.
      */
@@ -34,9 +31,8 @@ class RemoveLogsCommand extends FileBaseCommand
         if ($this->confirm('This command will REMOVE ALL your log-lines from your controllers.'."\n".'Are you sure you want to continue? [y|N]')) {
             $filesArray = $this->dirToArray($this->controllerBaseUrl);
             $this->loopFiles($filesArray);
-            $this->info("Removed log-lines in ". $this->controllerCount." controllers.");
+            $this->info('Removed log-lines in '.$this->controllerCount.' controllers.');
         }
-
     }
 
     /**
@@ -82,6 +78,6 @@ class RemoveLogsCommand extends FileBaseCommand
 
         $fileContents = preg_replace("/([\n| |\t]use Log;|[\n| |\t]*Log::.*\\(.*\\);)/", '', $fileContents);
 
-        $this->writeToFile($filePath,$fileContents);
+        $this->writeToFile($filePath, $fileContents);
     }
 }
